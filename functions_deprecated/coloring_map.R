@@ -12,6 +12,7 @@ coloring_map <- function(
     gbase=grid_base,
     list_normalized_dist=list_normalized_geo_abiotics_dists, # those dists can be used to create a convex mixture of distance matrices
     vet_alpha=c(0.05,0.10,0.20),
+    latMirrored=F,
     nclusters=10){
   
   D=as.matrix(D)
@@ -21,17 +22,27 @@ coloring_map <- function(
   #################################### Creating Phase ####################################
   ####################################                ####################################
   
+  
+  if(!latMirrored){
+    ### Settind dist matrices 
     D1 = as.dist(D)
-    D2 = as.dist( (1-as.numeric(vet_alpha[1]))*D + as.numeric(vet_alpha[1])*list_normalized_dist$geoDist)
-    D3 = as.dist( (1-as.numeric(vet_alpha[2]))*D + as.numeric(vet_alpha[2])*list_normalized_dist$geoDist)
-    D4 = as.dist( (1-as.numeric(vet_alpha[3]))*D + as.numeric(vet_alpha[3])*list_normalized_dist$geoDist)
+    D2= as.dist( (1-as.numeric(vet_alpha[1]))*D + as.numeric(vet_alpha[1])*list_normalized_dist$geo_Dist)
+    D3= as.dist( (1-as.numeric(vet_alpha[2]))*D + as.numeric(vet_alpha[2])*list_normalized_dist$geo_Dist)
+    D4= as.dist( (1-as.numeric(vet_alpha[3]))*D + as.numeric(vet_alpha[3])*list_normalized_dist$geo_Dist)
+  }else{
+    ### Settind dist matrices 
+    D1 = as.dist(D)
+    D2 = as.dist( (1-as.numeric(vet_alpha[1]))*D + as.numeric(vet_alpha[1])*list_normalized_dist$geo_Dist_mirrored)
+    D3 = as.dist( (1-as.numeric(vet_alpha[2]))*D + as.numeric(vet_alpha[2])*list_normalized_dist$geo_Dist_mirrored)
+    D4 = as.dist( (1-as.numeric(vet_alpha[3]))*D + as.numeric(vet_alpha[3])*list_normalized_dist$geo_Dist_mirrored)
+  }
   
   ####################################   Ward    ####################################
   #################################### Creating hclust objs
-  hclust_0 = hclust(d=D1,method='ward.D')
-  hclust_0.05 = hclust(d=D2,method='ward.D')
-  hclust_0.10 = hclust(d=D3,method='ward.D')
-  hclust_0.20 = hclust(d=D4,method='ward.D')
+  hclust_0 = hclust(d=D1,method='ward.D2')
+  hclust_0.05 = hclust(d=D2,method='ward.D2')
+  hclust_0.10 = hclust(d=D3,method='ward.D2')
+  hclust_0.20 = hclust(d=D4,method='ward.D2')
   
   #################################### With geodist 
   mat_cluster_membership <- cbind.data.frame(

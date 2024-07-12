@@ -3,10 +3,8 @@
 ########################################################
 #
 getwd()
-grump_stacked <- data.table::fread('/Users/rafaelcatoia/Desktop/repos/clusterPhyto_16NS/phyto_provinces_p16NS/data/ex_grump_asv_long20240501.csv')
+df <- data.table::fread('/Users/rafaelcatoia/Desktop/repos/clusterPhyto_16NS/phyto_provinces_p16NS/data/grump_asv_long.csv')
 
-## Yubins code
-df <- read.csv("/file/path/to/that/dropbox/link/file")
 ## Subset out the picocyanobacteria and diazotrophs from the main dataframe
 df[, c(2:11,54)][is.na(df[, c(2:11,54)])] <- "Not Applicable" 
 cyano <- rbind(df[df$Eco_relevant_plank_groups=="Prochlorococcus",],
