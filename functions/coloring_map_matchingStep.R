@@ -4,13 +4,14 @@
 # grid_base <- readRDS(paste0(savingdir,'/','grid_base'))
 # D = list_AitDist[[1]]
 # 
-## now given this and a vector of clusters we will
 
-
-coloring_map <- function(
+## here are the clusters that we will use as the TRUE labels
+coloring_map_matching <- function(
     D,
+    trueClusterMembership,
     gbase=grid_base,
     list_normalized_dist=list_normalized_geo_abiotics_dists, # those dists can be used to create a convex mixture of distance matrices
+    list_dist_toMatch=list_geo_abiotics_dists,
     vet_alpha=c(0.05,0.10,0.20),
     nclusters=10){
   
@@ -20,11 +21,13 @@ coloring_map <- function(
   ####################################                ####################################
   #################################### Creating Phase ####################################
   ####################################                ####################################
+  list_normalized_dist$abioticDist
   
     D1 = as.dist(D)
     D2 = as.dist( (1-as.numeric(vet_alpha[1]))*D + as.numeric(vet_alpha[1])*list_normalized_dist$geoDist)
     D3 = as.dist( (1-as.numeric(vet_alpha[2]))*D + as.numeric(vet_alpha[2])*list_normalized_dist$geoDist)
     D4 = as.dist( (1-as.numeric(vet_alpha[3]))*D + as.numeric(vet_alpha[3])*list_normalized_dist$geoDist)
+  
   
   ####################################   Ward    ####################################
   #################################### Creating hclust objs
@@ -46,8 +49,17 @@ coloring_map <- function(
     v4_pam=cluster::pam(x=D4,k = nclusters,cluster.only = T)
   )
   
-  ############# getting the cluster membership
-  
+  ####################################################################################
+  ## here we will match the clusters -------------------------------------------------
+  ####################################################################################
+  for(i in 1:ncol(mat_cluster_membership)){
+    mat_cluster_membership[,i]<-
+      matching_clusters(
+      DistMatrix = list_dist_toMatch$geoDist,
+      trueLabel = trueClusterMembership[,i],
+      proposedLabel = mat_cluster_membership[,i])
+  }
+  ####################################################################################
   out_list <- list()
   for(i in 1:ncol(mat_cluster_membership)){
     nneigh_colnames <- gbase %>% select(starts_with('n_neig')) %>% colnames()
